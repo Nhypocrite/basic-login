@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+
+<body>
+    <div class="container mt-5">
+        <h2 class="text-center">Login</h2>
+        <form method="POST" id="loginForm" >
+            <div class="form-group">
+                <label for="username">Name:</label>
+                <input type="text" class="form-control" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="remember_me" name="remember_me">
+                <label class="form-check-label" for="remember_me">Remember me</label>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Login</button>
+        </form>
+        <div class="text-center mt-3">
+            <p>Not registered yet? <a href="{{ url_for('register') }}">Go to register page</a></p>
+        </div>
+    </div>
+
+    <script>
+        // Function to hash the password using SHA-256
+        async function hashPassword(password) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            return hashHex;
+        }
+
+        // Add event listener to the form to hash the password on submit
+        const form = document.getElementById('loginForm');
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault(); // Prevent the default form submission
+
+            const passwordField = document.getElementById('password');
+            const hashedPassword = await hashPassword(passwordField.value);
+
+            // Replace the plain password with the hashed one
+            passwordField.value = hashedPassword;
+
+            // Submit the form
+            form.submit();
+        });
+    </script>
+</body>
+
+</html>
